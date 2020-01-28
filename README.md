@@ -1,24 +1,23 @@
 # ansible_challenge
 
-This repo primarily conists of one ansible playbook,templates and files which are required to perform the below 6 tasks, and the ansible playbook already has been 
-tested successfully on Ubuntu 16.04. 
+  This repo primarily conists of one ansible playbook,templates and files which are required to perform the below 5 tasks, and the ansible playbook already has been tested successfully on Ubuntu 16.04. 
 
-1 Write an Ansible Playbook to perform the following including install the following software for development on EC2 "ec2_devops"
+  This Ansible Playbook install and configure the following applications, For example: Here  I have installed all these on a aws EC2  instance named "ec2_devops".  You may refer https://github.com/nafasm/terraform_challenge for more information. 
 
 2 Apache webserver; Configure it to start at server boot, and listening on all interfaces on port 80
 
-3 Tomcat application server;Configure it to start at server boot, and listening on all interfaces on port 8080
+2 Tomcat application server;Configure it to start at server boot, and listening on all interfaces on port 8080
 
-4 MySQL database server;Configure it to start at server boot, and listening on all interfaces on port 3306
+3 MySQL database server;Configure it to start at server boot, and listening on all interfaces on port 3306
 
-5 Install below packages
+4 Install below packages
 
   Telnet
   Curl
   Nslookup
   Oracle JDK
   
-6 Disable firewalls on "ec2_devops" or allow ports 80, 8080, 3306 from anywhere to access the 3 services configured above. 
+5 Disable firewalls on "ec2_devops" or allow ports 80, 8080, 3306 from anywhere to access the 3 services configured above. 
 
 How to run the playbook 
 
