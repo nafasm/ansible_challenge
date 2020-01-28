@@ -1,0 +1,175 @@
+
+1 Apache webserver; Configure it to start at server boot, and listening on all interfaces on port 80;
+---
+- name: Install apache webserver
+  hosts: ec2_devops
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: Install apache2 packages
+    apt:
+      name: apache2
+      update_cache: yes
+      state: latest
+  - name: httpd service start on  boot
+    service: name=apache2 enabled=yes
+  - name: apache2 listen on port 80
+    lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen*" line="Listen 80" state=present
+    notify:
+      - restart apache2 webserver
+  handlers:
+  - name: restart apache2 webserver
+    service:
+      name: apache2
+      state: restarted
+
+https://www.digitalocean.com/community/tutorials/how-to-configure-apache-using-ansible-on-ubuntu-14-04
+
+
+2 Tomcat application server;Configure it to start at server boot, and listening on all interfaces on port 8080;
+# Tomcat 
+---
+- name: Install apache tomcat
+  hosts: ec2_devops
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: Install Java 1.7
+    yum: name=java-1.7.0-openjdk state=present
+
+  - name: add group "tomcat"
+    group: name=tomcat
+
+  - name: add user "tomcat"
+    user: name=tomcat group=tomcat home=/usr/share/tomcat createhome=no
+    become: True
+    become_method: sudo
+
+  - name: Download Tomcat
+    get_url: url=http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.61/bin/apache-tomcat-7.0.61.tar.gz dest=/opt/apache-tomcat-7.0.61.tar.gz
+
+  - name: Extract archive
+    command: chdir=/usr/share /bin/tar xvf /opt/apache-tomcat-7.0.61.tar.gz -C /opt/ creates=/opt/apache-tomcat-7.0.61
+
+  - name: Symlink install directory
+    file: src=/opt/apache-tomcat-7.0.61 path=/usr/share/tomcat state=link
+
+  - name: Change ownership of Tomcat installation
+    file: path=/usr/share/tomcat/ owner=tomcat group=tomcat state=directory recurse=yes
+
+  - name: Configure Tomcat server
+    template: src=server.xml dest=/usr/share/tomcat/conf/
+    notify: restart tomcat
+
+  - name: Configure Tomcat users
+    template: src=tomcat-users.xml dest=/usr/share/tomcat/conf/
+    notify: restart tomcat
+
+  - name: Install Tomcat init script
+    copy: src=tomcat-initscript.sh dest=/etc/init.d/tomcat mode=0755
+
+  - name: Start Tomcat
+    service: name=tomcat state=started enabled=yes
+  
+  - name: wait for tomcat to start
+    wait_for: port={{http_port}}
+  handlers:
+  - name: restart tomcat
+    service: name=tomcat state=restarted
+
+  - name: restart iptables
+    service: name=iptables state=restarted
+
+
+
+3 MySQL database server;Configure it to start at server boot, and listening on all interfaces on port 3306;
+
+https://stackoverflow.com/questions/26597926/install-mysql-with-ansible-on-ubuntu
+---
+- name: Install mysql on ec2_devops
+  hosts: ec2_devops
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Install MySQL
+      apt:
+        name: ['python-mysqldb', 'mysql-server']
+        update_cache: yes
+        cache_valid_time: 3600
+        state: present
+    - name: copy .my.cnf file with root password credentials
+      template:
+        src: /home/ubuntu/my.cnf.j2
+        dest: /root/.my.cnf
+        owner: root
+        mode: 0600
+    - name: Start the MySQL service
+      service:
+        name: mysql
+        state: started
+        enabled: true
+    - name: update mysql root password for all root accounts
+      mysql_user: name=root host="{{ item }}" password="{{ mysql_root_password }}" priv=*.*:ALL,GRANT
+      with_items:
+        - "{{ ansible_hostname }}"
+        - 127.0.0.1
+        - ::1
+        - localhost
+
+    - name: Ensure mysql service start on  boot
+      service:
+        name: mysql
+        enabled: yes
+
+#4-6 Below covers task 4,5 and 6, installation of telnet,curl and nslookup
+- name: Install telnet curl nslookup oracle jdsk package on ec2_devops
+  hosts: ec2_devops
+  become: yes
+  become_method: sudo
+  remote_user: ubuntu
+  tasks:
+  - name: Install tomcat application  packages
+    apt:
+      name: ['telnet', 'curl', 'dnsutils']
+
+#7 Oracle JDK instlation 
+- name: Install telnet curl nslookup oracle jdsk package on ec2_devops
+  hosts: ec2_devops
+  become_method: sudo
+  remote_user: ubuntu
+  tasks:
+  - name: Install add-apt-repostory
+    become: yes
+    apt: name=software-properties-common state=latest
+
+  - name: Add Oracle Java Repository
+    become: yes
+    apt_repository: repo='ppa:webupd8team/java'
+  - name: Accept Java 8 License
+    become: yes
+    debconf: name='oracle-java8-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+
+  - name: Install Oracle Java 8
+    become: yes
+    apt: name={{item}} state=latest
+    with_items:
+     - oracle-java8-installer
+     - ca-certificates
+     - oracle-java8-set-default 
+
+
+#8 Disable firewalls on "ec2_devops" or allow ports 80, 8080, 3306 from anywhere to access the 3 services configured above;
+- name: Allow firewall ports 80,8080 and 3306 from anywhere
+  hosts: ec2_devops
+  become_user: root
+  tasks:
+  - name: Allow port 80
+    ufw: proto=tcp port=80 rule=allow
+  - name: Allow port 8080
+    ufw: proto=tcp port=8080 rule=allow
+  - name: Allow port 3306
+    ufw: proto=tcp port=3306 rule=allow
+
