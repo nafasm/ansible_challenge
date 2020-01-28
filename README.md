@@ -4,20 +4,20 @@
 
   This Ansible Playbook install and configure the following applications, For example: Here  I have installed all these on a aws EC2  instance named "ec2_devops".  You may refer https://github.com/nafasm/terraform_challenge for more information. 
 
-2 Apache webserver; Configure it to start at server boot, and listening on all interfaces on port 80
+1.  Apache webserver; Configure it to start at server boot, and listening on all interfaces on port 80
 
-2 Tomcat application server;Configure it to start at server boot, and listening on all interfaces on port 8080
+2. Tomcat application server;Configure it to start at server boot, and listening on all interfaces on port 8080
 
-3 MySQL database server;Configure it to start at server boot, and listening on all interfaces on port 3306
+3. MySQL database server;Configure it to start at server boot, and listening on all interfaces on port 3306
 
-4 Install below packages
+4. Install below packages
 
   Telnet
   Curl
   Nslookup
   Oracle JDK
   
-5 Disable firewalls on "ec2_devops" or allow ports 80, 8080, 3306 from anywhere to access the 3 services configured above. 
+5. Disable firewalls on "ec2_devops" or allow ports 80, 8080, 3306 from anywhere to access the 3 services configured above. 
 
 How to run the playbook 
 
