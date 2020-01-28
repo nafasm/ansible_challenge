@@ -17,8 +17,9 @@ tested successfully on Ubuntu 16.04.
 How to run the playbook 
 
 #######################
-                 Download all files attached in this repo, I have placed those files  /home/ubuntu on the ansible server.  If you you would like to copy these files under different location, then  please update ansible_main.yaml file as well.
-                 Below ansible variables have been updated in /etc/ansible/hosts file. 
+
+                1.  Download all files attached in this repo, I have placed those files  /home/ubuntu on the ansible server.  If you you would like to copy these files under different location, then  please update ansible_main.yaml file as well.
+                2. Update varialbes and host information in /etc/ansible/hosts file.  For exmaple, I have updated my /etc/ansible/hosts as below 
 
 [ec2_devops]
 10.7.7.1 #Here you have to mention the IP address where you will be installing and configuring apache httpd, apache tomcat and mysql
@@ -30,8 +31,8 @@ admin_password= adminsecret
 mysql_root_password = my_Sq1kk
 root@ip-172-17-17-222:~#
 
-                 
-                 Run the below command to execute the playbook
+            3.  Run the below command to execute the playbook
+            
                  #ansible-playbook ansible_main.yaml
                  
                  
