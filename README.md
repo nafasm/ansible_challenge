@@ -1,4 +1,4 @@
-# ansible_challenge
+# Ansible_challenge
 
   This repo primarily conists of one ansible playbook,templates and files which are required to perform the below 5 tasks, and the ansible playbook already has been tested successfully on Ubuntu 16.04. 
 
